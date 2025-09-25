@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  # 카카오 로그인 API 서버
+  kakao-login-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kakao-login-api
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    env_file:
+      - .env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - kakao-network
+    depends_on:
+      - mariadb
+    volumes:
+      # 로그 볼륨 (선택적)
+      - ./logs:/app/logs
+
+  # MariaDB 데이터베이스 (개발/테스트용)
+  mariadb:
+    image: mariadb:10.6
+    container_name: kakao-mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_CHARACTER_SET_SERVER: utf8mb4
+      MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - kakao-network
+
+  # nginx 리버스 프록시 (선택적)
+  nginx:
+    image: nginx:alpine
+    container_name: kakao-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - kakao-login-api
+    restart: unless-stopped
+    networks:
+      - kakao-network
+
+networks:
+  kakao-network:
+    driver: bridge
+
+volumes:
+  mariadb_data:
+    driver: local

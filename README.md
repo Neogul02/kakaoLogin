@@ -1,4 +1,107 @@
-# 카카오 소셜 로그인 테스트 서버
+# # 🍋 카카오 로그인 REST API
+
+React 앱에서 사용할 수 있는 카카오 소셜 로그인 REST API 서버입니다.
+
+## ✨ 주요 기능
+
+- 🔐 카카오 OAuth 2.0 로그인/로그아웃
+- 👤 사용자 정보 관리 (세션 + 데이터베이스)
+- 🌐 CORS 설정으로 외부 React 앱 지원
+- 🐳 Docker 컨테이너화 지원
+- ☁️ 클라우드 타입 배포 지원
+- 📊 사용자 관리 API
+- 💾 MariaDB 데이터베이스 연동
+
+## 🚀 빠른 시작
+
+### 로컬 실행
+
+```bash
+# 저장소 클론
+git clone https://github.com/Neogul02/kakaoLogin.git
+cd kakaoLogin
+
+# 의존성 설치
+npm install
+
+# 환경변수 설정
+cp .env.example .env
+# .env 파일을 편집하여 실제 값들을 입력
+
+# 개발 서버 실행
+npm run dev
+
+# 또는 프로덕션 서버 실행
+npm start
+```
+
+### Docker로 실행
+
+```bash
+# 개발 환경
+npm run docker:dev
+
+# 프로덕션 환경  
+npm run docker:prod
+
+# 단독 실행
+npm run docker:build
+npm run docker:run
+```
+
+## 📡 API 엔드포인트
+
+### 🔐 인증 관련
+- `GET /api/auth/kakao` - 카카오 로그인 URL 획득
+- `GET /api/auth/kakao/callback` - 카카오 로그인 콜백
+- `GET /api/auth/user` - 현재 사용자 정보
+- `POST /api/auth/logout` - 로그아웃
+
+### 👥 사용자 관리
+- `GET /api/users` - 전체 사용자 목록
+- `GET /api/users/:userId` - 특정 사용자 정보
+- `DELETE /api/users/:userId` - 사용자 삭제
+
+### 🛠️ 시스템
+- `GET /health` - 서버 상태 확인
+- `GET /api/db/status` - 데이터베이스 상태
+- `GET /api` - API 문서
+
+## ⚛️ React 앱에서 사용법
+
+### 1. 카카오 로그인 시작
+
+```javascript
+const handleKakaoLogin = async () => {
+  const response = await fetch('http://localhost:3000/api/auth/kakao', {
+    credentials: 'include'
+  });
+  const data = await response.json();
+  window.location.href = data.authUrl;
+};
+```
+
+### 2. 로그인 상태 확인
+
+```javascript
+const checkLoginStatus = async () => {
+  const response = await fetch('http://localhost:3000/api/auth/user', {
+    credentials: 'include'
+  });
+  
+  if (response.ok) {
+    const userData = await response.json();
+    return userData.user;
+  }
+  return null;
+};
+```
+
+**예제 컴포넌트**: `examples/react-component.jsx` 파일을 참고하세요.
+
+## ☁️ 클라우드 타입 배포
+
+자세한 배포 가이드는 [CLOUDTYPE_DEPLOY.md](./CLOUDTYPE_DEPLOY.md)를 참고하세요.
 
 Node.js Express를 사용한 카카오 소셜 로그인 구현 예제입니다.
 
