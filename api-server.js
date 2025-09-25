@@ -95,9 +95,38 @@ app.get('/api', (req, res) => {
       system: {
         'GET /health': '서버 상태 확인',
         'GET /api/db/status': '데이터베이스 상태 확인'
+      },
+      pages: {
+        'GET /': '메인 페이지',
+        'GET /admin': '사용자 관리 페이지',
+        'GET /success': '로그인 성공 페이지',
+        'GET /error': '에러 페이지'
       }
     }
   })
+})
+
+// 메인 페이지
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'))
+})
+
+// 사용자 관리 페이지
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'))
+})
+
+// 로그인 성공 페이지
+app.get('/success', (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/')
+  }
+  res.sendFile(path.join(__dirname, 'public', 'success.html'))
+})
+
+// 에러 페이지
+app.get('/error', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'error.html'))
 })
 
 // 카카오 로그인 시작 - React 앱에서 호출할 URL 반환
