@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0" />
+    <title>카카오 소셜 로그인 테스트</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Malgun Gothic', sans-serif;
+        background: linear-gradient(135deg, #fee500 0%, #ffeb3b 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .container {
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+      }
+
+      .logo {
+        width: 80px;
+        height: 80px;
+        background: #fee500;
+        border-radius: 50%;
+        margin: 0 auto 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        font-weight: bold;
+        color: #3c1e1e;
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 10px;
+        font-size: 24px;
+      }
+
+      .subtitle {
+        color: #666;
+        margin-bottom: 30px;
+        font-size: 14px;
+      }
+
+      .kakao-login-btn {
+        background: #fee500;
+        color: #3c1e1e;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        width: 100%;
+      }
+
+      .kakao-login-btn:hover {
+        background: #ffd700;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .info {
+        margin-top: 30px;
+        padding: 20px;
+        background: #f9f9f9;
+        border-radius: 10px;
+        font-size: 12px;
+        color: #666;
+        line-height: 1.5;
+      }
+
+      .status {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 8px;
+        font-size: 14px;
+      }
+
+      .status.info {
+        background: #e3f2fd;
+        color: #1976d2;
+        border: 1px solid #bbdefb;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="logo">K</div>
+      <h1>카카오 소셜 로그인</h1>
+      <p class="subtitle">간편하게 카카오 계정으로 로그인하세요</p>
+
+      <a
+        href="/auth/kakao"
+        class="kakao-login-btn">
+        🍫 카카오로 로그인
+      </a>
+
+      <div style="margin-top: 20px">
+        <a
+          href="/admin"
+          style="background: #6c757d; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-size: 14px; display: inline-block">
+          👥 사용자 관리
+        </a>
+      </div>
+
+      <div class="info">
+        <strong>테스트 서버 정보:</strong><br />
+        - 포트: 8080<br />
+        - 환경: 개발 모드<br />
+        - 상태: <span id="server-status">연결됨</span>
+      </div>
+
+      <div class="status info">ℹ️ 카카오 개발자 센터에서 앱 등록 후 클라이언트 ID를 .env 파일에 설정해주세요.</div>
+    </div>
+
+    <script>
+      // 서버 상태 확인
+      fetch('/api/user')
+        .then((response) => {
+          if (response.status === 401) {
+            document.getElementById('server-status').textContent = '대기중 (로그인 필요)'
+          } else {
+            document.getElementById('server-status').textContent = '활성'
+          }
+        })
+        .catch(() => {
+          document.getElementById('server-status').textContent = '오류'
+        })
+    </script>
+  </body>
+</html>

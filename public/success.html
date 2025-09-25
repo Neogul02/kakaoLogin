@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0" />
+    <title>로그인 성공 - 카카오 소셜 로그인</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Malgun Gothic', sans-serif;
+        background: linear-gradient(135deg, #4caf50 0%, #81c784 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .container {
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        max-width: 500px;
+        width: 90%;
+      }
+
+      .success-icon {
+        width: 80px;
+        height: 80px;
+        background: #4caf50;
+        border-radius: 50%;
+        margin: 0 auto 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        color: white;
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 10px;
+        font-size: 24px;
+      }
+
+      .subtitle {
+        color: #666;
+        margin-bottom: 30px;
+        font-size: 14px;
+      }
+
+      .user-info {
+        background: #f9f9f9;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+        text-align: left;
+      }
+
+      .user-info h3 {
+        color: #333;
+        margin-bottom: 15px;
+        text-align: center;
+      }
+
+      .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+      }
+
+      .info-item:last-child {
+        border-bottom: none;
+      }
+
+      .info-label {
+        font-weight: bold;
+        color: #555;
+      }
+
+      .info-value {
+        color: #333;
+        word-break: break-all;
+      }
+
+      .profile-image {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+      }
+
+      .btn {
+        flex: 1;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 10px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+      }
+
+      .btn-primary {
+        background: #2196f3;
+        color: white;
+      }
+
+      .btn-secondary {
+        background: #ff5722;
+        color: white;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .loading {
+        color: #666;
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="success-icon">✓</div>
+      <h1>로그인 성공!</h1>
+      <p class="subtitle">카카오 계정으로 성공적으로 로그인되었습니다</p>
+
+      <div class="user-info">
+        <h3>사용자 정보</h3>
+        <div id="user-data">
+          <div class="loading">사용자 정보를 불러오는 중...</div>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <a
+          href="/"
+          class="btn btn-primary"
+          >홈으로</a
+        >
+        <button
+          onclick="logout()"
+          class="btn btn-secondary">
+          로그아웃
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // 사용자 정보 불러오기
+      async function loadUserInfo() {
+        try {
+          const response = await fetch('/api/user')
+          if (response.ok) {
+            const user = await response.json()
+            displayUserInfo(user)
+          } else {
+            document.getElementById('user-data').innerHTML = '<div style="color: red;">사용자 정보를 불러올 수 없습니다.</div>'
+          }
+        } catch (error) {
+          console.error('사용자 정보 로드 오류:', error)
+          document.getElementById('user-data').innerHTML = '<div style="color: red;">오류가 발생했습니다.</div>'
+        }
+      }
+
+      function displayUserInfo(user) {
+        const userDataEl = document.getElementById('user-data')
+        userDataEl.innerHTML = `
+                <div class="info-item">
+                    <span class="info-label">사용자 ID:</span>
+                    <span class="info-value">${user.id}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">닉네임:</span>
+                    <span class="info-value">${user.nickname || '없음'}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">이메일:</span>
+                    <span class="info-value">${user.email || '비공개'}</span>
+                </div>
+                ${
+                  user.profile_image
+                    ? `
+                <div class="info-item">
+                    <span class="info-label">프로필 이미지:</span>
+                    <img src="${user.profile_image}" alt="프로필" class="profile-image">
+                </div>
+                `
+                    : ''
+                }
+            `
+      }
+
+      async function logout() {
+        if (confirm('정말 로그아웃하시겠습니까?')) {
+          try {
+            const response = await fetch('/auth/logout', {
+              method: 'POST',
+            })
+
+            if (response.ok) {
+              alert('로그아웃되었습니다.')
+              window.location.href = '/'
+            } else {
+              alert('로그아웃 중 오류가 발생했습니다.')
+            }
+          } catch (error) {
+            console.error('로그아웃 오류:', error)
+            alert('로그아웃 중 오류가 발생했습니다.')
+          }
+        }
+      }
+
+      // 페이지 로드 시 사용자 정보 불러오기
+      window.onload = loadUserInfo
+    </script>
+  </body>
+</html>
